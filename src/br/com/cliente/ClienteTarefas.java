@@ -1,5 +1,8 @@
 package br.com.cliente;
 
+import br.com.cliente.interface_grafica.InterfaceGrafica;
+
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
@@ -13,15 +16,62 @@ public class ClienteTarefas {
 
 
         System.out.println("conexao estabelecida");
+//        InterfaceGrafica ig = new InterfaceGrafica(socket);
+//        ig.montaTela();
+        Thread threadEnviaComando = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    System.out.println("Pode enviar comandos!");
+                PrintStream saida = new PrintStream(socket.getOutputStream());
 
-        PrintStream saida = new PrintStream(socket.getOutputStream());
-        saida.println("c1");
+                Scanner teclado = new Scanner(System.in);
+                while (teclado.hasNextLine()){
+                    String linha = teclado.nextLine();
 
-        Scanner teclado = new Scanner(System.in);
-        teclado.nextLine();
+                    if (linha.trim().equals("")){
+                        break;
+                    }
+                    saida.println(linha);
 
-        saida.close();
-        teclado.close();
+                }
+                    saida.close();
+                    teclado.close();
+            }catch (IOException ex){
+                    throw  new RuntimeException(ex);
+                }
+            }
+        }, "threadEnviaComando");
+
+        System.out.println("------ Recebendo dados do servidor --------- ");
+
+        Thread threadRecebeResposta = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Scanner respostaServidor = null;
+                try {
+                    respostaServidor = new Scanner(socket.getInputStream());
+
+                    while (respostaServidor.hasNextLine()) {
+                        String linha = respostaServidor.nextLine();
+                        System.out.println(linha);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                respostaServidor.close();
+            }
+        },"threadRecebeResposta");
+
+
+        threadRecebeResposta.start();
+        threadEnviaComando.start();
+
+        threadEnviaComando.join();
+
+
+        System.out.println("Fechando socket do cliente ");
         socket.close();
 
     }
