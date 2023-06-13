@@ -1,13 +1,11 @@
-package br.com.cliente;
-
-import br.com.cliente.interface_grafica.InterfaceGrafica;
+package br.com.cliente.test;
 
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class ClienteTarefas {
+public class TestaClienteTarefas {
 
 
     public static void main(String[] args) throws Exception{
