@@ -1,5 +1,7 @@
 package br.com.servidor;
 
+import br.com.servidor.factorys.FabricaDeThreads;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -18,7 +20,7 @@ public class ServidorTarefas {
     public ServidorTarefas() throws IOException {
         System.out.println("-------- Iniciando Servidor  -------- ");
          this.servidor = new ServerSocket(12345);
-        this.threadPool = Executors.newCachedThreadPool();
+        this.threadPool = Executors.newCachedThreadPool( new FabricaDeThreads());
         this.estaRodando = new AtomicBoolean(true);
     }
 
@@ -44,7 +46,7 @@ public class ServidorTarefas {
                 System.out.println(" Aceitando novo cliente na porta :" + socket.getPort());
 
 
-                DistribuiTarefas distribuiTarefas = new DistribuiTarefas(socket, this);
+                DistribuiTarefas distribuiTarefas = new DistribuiTarefas(threadPool,socket, this);
                 threadPool.execute(distribuiTarefas);
             }catch (SocketException ex){
                 System.out.println("SocketException, Está rodando? " + this.estaRodando);
