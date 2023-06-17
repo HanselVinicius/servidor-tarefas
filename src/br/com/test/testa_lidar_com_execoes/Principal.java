@@ -9,20 +9,10 @@ public class Principal {
 
     public static void main(String[] args) {
         Properties properties = new Properties();
-        ExecutorService threadPool = Executors.newCachedThreadPool(new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r);
-                thread.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-                    @Override
-                    public void uncaughtException(Thread t, Throwable e) {
-                        System.out.println("Erro na thread " +e  +" na thread  " +t);
-                    }
-                });
-                thread.start();
-                return thread;
-            }
-        });
+
+        ExecutorService threadPool = Executors.newCachedThreadPool(new FactoryThread());
+
+
 
 
         threadPool.execute(new LeitorPropriedades(properties, "arquivo1.txt"));
